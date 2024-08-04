@@ -23,8 +23,15 @@ class Product:
             return self.price < other.price
         return False
     
-    
-    
+# Новый тип продукта - HouseholdItem
+class HouseholdItem(Product):
+    def __init__(self, name, price, brend):
+        super().__init__(name, price)
+        self.brend = brend
+
+    def __str__(self): 
+        return f"HouseholdItem(name:{self.name}, price: {self.price}, brend: {self.brend})"
+           
     
 class Customer:
     def __init__(self, name):
@@ -42,9 +49,7 @@ class Customer:
         orders_str = ', '.join(str(order) for order in self.orders)
         return f"Customer(name: {self.name}, orders: [{orders_str}])"
             
-  
-            
-            
+             
 class Order: 
     # Статические переменные для подсчёта общего колличества заказов и общей суммы заказов
     order_count = 0    
@@ -88,8 +93,6 @@ class Order:
         return f"Order(products: [{products_str}])"
     
     
-    
-    
 class Discount:
     def __init__(self, description, discount_percent):
         # Инициализация атрибутов description и discount_percent
@@ -108,12 +111,37 @@ class Discount:
         return f"Discount(description: {self.description}, discount_percent: {self.discount_percent})"
 
 
+# Класс ShoppingCart
+class ShoppingCart:
+    admin_user = "admin"
+
+    def __init__(self,customer):
+        self.customer = customer
+        self.orders = []
+
+
+    def add_order(self,order):
+        self.orders.append(order)  
+
+
+    def get_details(self):
+        orders_str =', '.join(str(order) for order in self.orders)
+        total = sum(order.calculate_total() for order in self.orders)
+        return (f"Покупатель {self.customer.name} приобрёл: {orders_str}."
+                f"Общая сумма: {total}. Зарегестрировал покупки пользователь: {ShoppingCart.admin_user}")
+    
+
+    def __str__(self):
+        return self.get_details()
+
 
 
 # Создание продуктов
 product1 = Product("Laptop",1000)
 product2 = Product("Smartphone",500)
 product3 = Product("Column",100)
+household_item1 = HouseholdItem("Washing Powder", 20, "Brend")
+
 
 
 # Создание клиентов
@@ -123,13 +151,23 @@ customer2 = Customer("Борис")
 # Создание заказов
 order1 = Order([product1, product2])
 order2 = Order([product2, product3]) 
-order3 = Order([product1, product3])  
+order3 = Order([product1, product3, household_item1])  
 
 
-# Добавление заказов к клиентам
+# Создание корзин
+cart1 = ShoppingCart(customer1)
+cart2 = ShoppingCart(customer2)
+
+
+# Добавление заказов к клиентам и корзинам
 customer1.add_order(order1)
 customer1.add_order(order2)
+cart1.add_order(order1)
+cart1.add_order(order2)
+
+
 customer2.add_order(order3)
+cart2.add_order(order3)
 
 
 # Создание скидок
@@ -150,6 +188,8 @@ total_revenue = Order.get_total_revenue()
 # Вывод информации
 print(customer1)
 print(customer2)
+print(cart1)
+print(cart2)
 print(f"Total orders: {total_orders}")
 print(f"Total revenue: {total_revenue}")
 print(f"Order 1 discountedtotal: {order1_discounted_total}")
